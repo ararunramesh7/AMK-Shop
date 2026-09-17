@@ -1,0 +1,202 @@
+/* ============================================================
+   ARUNA MURUKU KADAI — Design Tokens
+   CSS Custom Properties for consistent theming
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---- Color Palette (Warm Indian Snack Shop) ---- */
+  
+  /* Primary: Saffron / Turmeric Gold */
+  --color-primary-50: #FFF8E1;
+  --color-primary-100: #FFECB3;
+  --color-primary-200: #FFE082;
+  --color-primary-300: #FFD54F;
+  --color-primary-400: #FFCA28;
+  --color-primary-500: #FFC107;
+  --color-primary-600: #FFB300;
+  --color-primary-700: #FFA000;
+  --color-primary-800: #FF8F00;
+  --color-primary-900: #FF6F00;
+
+  /* Secondary: Rich Spice Red */
+  --color-secondary-50: #FBE9E7;
+  --color-secondary-100: #FFCCBC;
+  --color-secondary-200: #FFAB91;
+  --color-secondary-300: #FF8A65;
+  --color-secondary-400: #FF7043;
+  --color-secondary-500: #FF5722;
+  --color-secondary-600: #F4511E;
+  --color-secondary-700: #E64A19;
+  --color-secondary-800: #D84315;
+  --color-secondary-900: #BF360C;
+
+  /* Accent: Fresh Green */
+  --color-accent-50: #E8F5E9;
+  --color-accent-100: #C8E6C9;
+  --color-accent-200: #A5D6A7;
+  --color-accent-300: #81C784;
+  --color-accent-400: #66BB6A;
+  --color-accent-500: #4CAF50;
+  --color-accent-600: #43A047;
+  --color-accent-700: #388E3C;
+  --color-accent-800: #2E7D32;
+  --color-accent-900: #1B5E20;
+
+  /* Neutrals */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #FAFAFA;
+  --color-neutral-100: #F5F5F5;
+  --color-neutral-200: #EEEEEE;
+  --color-neutral-300: #E0E0E0;
+  --color-neutral-400: #BDBDBD;
+  --color-neutral-500: #9E9E9E;
+  --color-neutral-600: #757575;
+  --color-neutral-700: #616161;
+  --color-neutral-800: #424242;
+  --color-neutral-900: #212121;
+  --color-neutral-950: #121212;
+
+  /* Semantic Colors */
+  --color-success: #2E7D32;
+  --color-success-light: #E8F5E9;
+  --color-warning: #F57F17;
+  --color-warning-light: #FFF8E1;
+  --color-error: #C62828;
+  --color-error-light: #FFEBEE;
+  --color-info: #1565C0;
+  --color-info-light: #E3F2FD;
+
+  /* ---- Theme (Light Mode) ---- */
+  --bg-primary: #FFF9F0;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #FFF3E0;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF8E1;
+  --bg-sidebar: #2D1810;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  --text-primary: #1A1A1A;
+  --text-secondary: #5D4037;
+  --text-tertiary: #8D6E63;
+  --text-inverse: #FFFFFF;
+  --text-muted: #9E9E9E;
+  --text-link: #E65100;
+
+  --border-color: #E8D5C4;
+  --border-color-light: #F0E6DC;
+  --border-color-focus: #FF8F00;
+
+  --shadow-sm: 0 1px 2px rgba(45, 24, 16, 0.05);
+  --shadow-md: 0 4px 12px rgba(45, 24, 16, 0.08);
+  --shadow-lg: 0 8px 30px rgba(45, 24, 16, 0.12);
+  --shadow-xl: 0 20px 60px rgba(45, 24, 16, 0.15);
+  --shadow-glow: 0 0 20px rgba(255, 152, 0, 0.3);
+  --shadow-card: 0 2px 8px rgba(45, 24, 16, 0.06), 0 1px 2px rgba(45, 24, 16, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(45, 24, 16, 0.12), 0 2px 6px rgba(45, 24, 16, 0.06);
+
+  /* ---- Typography ---- */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', 'Noto Sans Tamil', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  --text-6xl: 3.75rem;   /* 60px */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* ---- Spacing ---- */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* ---- Transitions ---- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Z-index ---- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-header: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+
+  /* ---- Layout ---- */
+  --header-height: 64px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+  --max-content: 1200px;
+  --max-content-sm: 640px;
+  --max-content-md: 768px;
+  --max-content-lg: 1024px;
+}
+
+/* ---- Dark Mode ---- */
+[data-theme="dark"] {
+  --bg-primary: #1A1210;
+  --bg-secondary: #231A14;
+  --bg-tertiary: #2D2018;
+  --bg-card: #2D2018;
+  --bg-card-hover: #3D2E22;
+  --bg-sidebar: #1A1210;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-glass: rgba(26, 18, 16, 0.85);
+
+  --text-primary: #F5EDE8;
+  --text-secondary: #D7CCC8;
+  --text-tertiary: #A1887F;
+  --text-inverse: #1A1A1A;
+  --text-muted: #8D6E63;
+  --text-link: #FFB74D;
+
+  --border-color: #3E2E22;
+  --border-color-light: #2D2018;
+  --border-color-focus: #FFB300;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
