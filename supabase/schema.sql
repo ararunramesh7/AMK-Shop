@@ -529,112 +529,13 @@ CREATE TRIGGER update_categories_updated_at
   BEFORE UPDATE ON categories
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
-DROP TRIGGER IF EXISTS update_shop_settings_updated_at ON shop_settings;
-CREATE TRIGGER update_shop_settings_updated_at
-  BEFORE UPDATE ON shop_settings
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
--- Create shop_settings table
-CREATE TABLE IF NOT EXISTS public.shop_settings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_location text NOT NULL DEFAULT 'Main Branch',
-  free_delivery_distance_km numeric NOT NULL DEFAULT 2,
-  extra_charge_per_km numeric NOT NULL DEFAULT 15,
-  business_hours text NOT NULL DEFAULT '09:00 AM - 08:00 PM',
-  delivery_available boolean NOT NULL DEFAULT true,
-  updated_at timestamptz DEFAULT now()
-);
-
--- Insert a default row if it doesn't exist
-INSERT INTO public.shop_settings (id)
-SELECT '00000000-0000-0000-0000-000000000000'
-WHERE NOT EXISTS (SELECT 1 FROM public.shop_settings);
-
--- RLS Policies
-ALTER TABLE public.shop_settings ENABLE ROW LEVEL SECURITY;
-
--- Anyone can read settings
-CREATE POLICY "Settings are viewable by everyone" ON public.shop_settings
-  FOR SELECT USING (true);
-
--- Only admins can update settings
-CREATE POLICY "Settings can be updated by admins" ON public.shop_settings
-  FOR UPDATE USING (
-    auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
-  );
-
--- Function to calculate delivery charge based on distance
-CREATE OR REPLACE FUNCTION calculate_delivery_charge(distance_km numeric)
-RETURNS numeric
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  settings record;
-  charge numeric := 0;
-BEGIN
-  SELECT * INTO settings FROM public.shop_settings LIMIT 1;
-  
-  IF NOT settings.delivery_available THEN
-    RAISE EXCEPTION 'Delivery is currently not available';
-  END IF;
--- Create shop_settings table
-CREATE TABLE IF NOT EXISTS public.shop_settings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_location text NOT NULL DEFAULT 'Main Branch',
-  free_delivery_distance_km numeric NOT NULL DEFAULT 2,
-  extra_charge_per_km numeric NOT NULL DEFAULT 15,
-  business_hours text NOT NULL DEFAULT '09:00 AM - 08:00 PM',
-  delivery_available boolean NOT NULL DEFAULT true,
-  updated_at timestamptz DEFAULT now()
-);
-
--- Insert a default row if it doesn't exist
-INSERT INTO public.shop_settings (id)
-SELECT '00000000-0000-0000-0000-000000000000'
-WHERE NOT EXISTS (SELECT 1 FROM public.shop_settings);
-
--- RLS Policies
-ALTER TABLE public.shop_settings ENABLE ROW LEVEL SECURITY;
-
--- Anyone can read settings
-CREATE POLICY "Settings are viewable by everyone" ON public.shop_settings
-  FOR SELECT USING (true);
-
--- Only admins can update settings
-CREATE POLICY "Settings can be updated by admins" ON public.shop_settings
-  FOR UPDATE USING (
-    auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
-  );
-
--- Function to calculate delivery charge based on distance
-CREATE OR REPLACE FUNCTION calculate_delivery_charge(distance_km numeric)
-RETURNS numeric
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  settings record;
-  charge numeric := 0;
-BEGIN
-  SELECT * INTO settings FROM public.shop_settings LIMIT 1;
-  
-  IF NOT settings.delivery_available THEN
-    RAISE EXCEPTION 'Delivery is currently not available';
-  END IF;
-
-  IF distance_km > settings.free_delivery_distance_km THEN
-    charge := (distance_km - settings.free_delivery_distance_km) * settings.extra_charge_per_km;
-  END IF;
-
-  RETURN charge;
-END;
-$$;
-
 -- ============================================================
 -- ADMIN MANAGEMENT RPCS
 -- ============================================================
 
 -- Function to create a sub-admin
 CREATE OR REPLACE FUNCTION create_sub_admin(
-  p_email TEXT,
+  p_phone TEXT,
   p_password TEXT,
   p_full_name TEXT
 ) RETURNS JSONB AS $$
@@ -654,17 +555,17 @@ BEGIN
 
   -- Insert into auth.users
   INSERT INTO auth.users (
-    id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role
+    id, instance_id, phone, encrypted_password, phone_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role
   ) VALUES (
-    v_user_id, '00000000-0000-0000-0000-000000000000', p_email, v_encrypted_pw, now(), 
-    '{"provider":"email","providers":["email"]}', 
+    v_user_id, '00000000-0000-0000-0000-000000000000', p_phone, v_encrypted_pw, now(), 
+    '{"provider":"phone","providers":["phone"]}', 
     json_build_object('full_name', p_full_name, 'role', 'sub_admin'),
     'authenticated', 'authenticated'
   );
 
   -- Insert into auth.identities
   INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-  VALUES (gen_random_uuid(), v_user_id, v_user_id::TEXT, format('{"sub":"%s","email":"%s"}', v_user_id::TEXT, p_email)::JSONB, 'email', now(), now(), now());
+  VALUES (gen_random_uuid(), v_user_id, p_phone, format('{"sub":"%s","phone":"%s"}', v_user_id::TEXT, p_phone)::JSONB, 'phone', now(), now(), now());
   
   -- The profiles trigger will create the profile with 'customer' or default, so we enforce it here
   UPDATE profiles SET role = 'sub_admin', full_name = p_full_name WHERE id = v_user_id;

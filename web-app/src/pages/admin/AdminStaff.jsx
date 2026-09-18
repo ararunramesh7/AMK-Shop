@@ -11,7 +11,7 @@ export default function AdminStaff() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ fullName: '', phone: '', password: '' });
 
   // Redirect if not the main admin
   if (!isMainAdmin) {
@@ -43,8 +43,9 @@ export default function AdminStaff() {
     setSubmitting(true);
     
     try {
+      const formattedPhone = formData.phone.startsWith('+') ? formData.phone : `+91${formData.phone}`;
       const { data, error } = await supabase.rpc('create_sub_admin', {
-        p_email: formData.email,
+        p_phone: formattedPhone,
         p_password: formData.password,
         p_full_name: formData.fullName
       });
@@ -53,7 +54,7 @@ export default function AdminStaff() {
       
       toast.success('Sub-Admin created successfully!');
       setIsModalOpen(false);
-      setFormData({ fullName: '', email: '', password: '' });
+      setFormData({ fullName: '', phone: '', password: '' });
       fetchStaff();
     } catch (err) {
       console.error(err);
@@ -175,14 +176,14 @@ export default function AdminStaff() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Email Address</label>
+                <label className="form-label">Phone Number</label>
                 <input 
-                  type="email" 
+                  type="tel" 
                   className="form-input" 
                   required 
-                  value={formData.email} 
-                  onChange={e => setFormData({...formData, email: e.target.value})} 
-                  placeholder="ramesh@example.com"
+                  value={formData.phone} 
+                  onChange={e => setFormData({...formData, phone: e.target.value})} 
+                  placeholder="+919876543210"
                 />
               </div>
 

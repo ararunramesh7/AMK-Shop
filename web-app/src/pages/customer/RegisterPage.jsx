@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, User, Phone, MapPin, Building, Hash, AlertCircle } from 'lucide-react';
+import { Lock, User, Phone, MapPin, Building, Hash, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 import { validatePhone, validatePincode } from '../../utils/helpers';
 
@@ -11,9 +11,10 @@ export default function RegisterPage() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    fullName: '', email: '', phone: '', password: '', confirmPassword: '',
+    fullName: '', phone: '', username: '', password: '', confirmPassword: '',
     address: '', city: '', pincode: '',
   });
+  const [registerRole, setRegisterRole] = useState('customer'); // 'customer' or 'admin'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,8 +30,8 @@ export default function RegisterPage() {
 
   const validate = () => {
     if (!form.fullName.trim()) return t('errors.required_field');
-    if (!form.email.trim()) return t('errors.invalid_email');
-    if (!form.phone.trim() || !validatePhone(form.phone)) return t('errors.invalid_phone');
+    if (registerRole === 'customer' && (!form.phone.trim() || !validatePhone(form.phone))) return t('errors.invalid_phone');
+    if (registerRole === 'admin' && !form.username.trim()) return t('errors.required_field');
     if (form.password.length < 6) return t('errors.password_short');
     if (form.password !== form.confirmPassword) return t('errors.password_mismatch');
     return null;
@@ -44,15 +45,22 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
-    const { error: regError } = await register({
-      email: form.email,
+    const registerData = {
       password: form.password,
       fullName: form.fullName,
-      phone: form.phone,
       address: form.address,
       city: form.city,
       pincode: form.pincode,
-    });
+      role: registerRole,
+    };
+
+    if (registerRole === 'customer') {
+      registerData.phone = form.phone;
+    } else {
+      registerData.username = form.username;
+    }
+
+    const { error: regError } = await register(registerData);
 
     if (regError) {
       setError(regError.message || t('errors.register_failed'));
@@ -79,6 +87,36 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* Role Toggle */}
+          <div style={{ display: 'flex', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '8px', marginBottom: '24px' }}>
+            <button
+              type="button"
+              onClick={() => { setRegisterRole('customer'); setError(''); }}
+              style={{
+                flex: 1, padding: '10px 0', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+                background: registerRole === 'customer' ? 'var(--bg-card)' : 'transparent',
+                color: registerRole === 'customer' ? 'var(--text-main)' : 'var(--text-muted)',
+                boxShadow: registerRole === 'customer' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Customer
+            </button>
+            <button
+              type="button"
+              onClick={() => { setRegisterRole('admin'); setError(''); }}
+              style={{
+                flex: 1, padding: '10px 0', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+                background: registerRole === 'admin' ? 'var(--bg-card)' : 'transparent',
+                color: registerRole === 'admin' ? 'var(--text-main)' : 'var(--text-muted)',
+                boxShadow: registerRole === 'admin' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Admin
+            </button>
+          </div>
+
           <div className="auth-form__fields">
             <div className="input-group">
               <label className="input-group__label">{t('auth.full_name')} <span className="input-group__required">*</span></label>
@@ -88,22 +126,23 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div className="auth-form__row">
-              <div className="input-group">
-                <label className="input-group__label">{t('auth.email')} <span className="input-group__required">*</span></label>
-                <div className="input-wrapper">
-                  <Mail size={16} className="input-icon" />
-                  <input type="email" name="email" className="input input--with-icon" value={form.email} onChange={handleChange} required />
-                </div>
-              </div>
+            {registerRole === 'customer' ? (
               <div className="input-group">
                 <label className="input-group__label">{t('auth.phone')} <span className="input-group__required">*</span></label>
                 <div className="input-wrapper">
                   <Phone size={16} className="input-icon" />
-                  <input type="tel" name="phone" className="input input--with-icon" placeholder="9876543210" value={form.phone} onChange={handleChange} required />
+                  <input type="tel" name="phone" className="input input--with-icon" placeholder="9876543210" value={form.phone} onChange={handleChange} required={registerRole === 'customer'} />
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="input-group">
+                <label className="input-group__label">Username <span className="input-group__required">*</span></label>
+                <div className="input-wrapper">
+                  <span className="input-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', color: 'var(--text-muted)' }}>@</span>
+                  <input type="text" name="username" className="input input--with-icon" placeholder="admin" value={form.username} onChange={handleChange} required={registerRole === 'admin'} />
+                </div>
+              </div>
+            )}
 
             <div className="auth-form__row">
               <div className="input-group">

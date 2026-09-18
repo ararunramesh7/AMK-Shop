@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Phone, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 
 export default function LoginPage() {
@@ -9,7 +9,7 @@ export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ phone: '', username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loginRole, setLoginRole] = useState('customer'); // 'customer' or 'admin'
   const [loading, setLoading] = useState(false);
@@ -28,20 +28,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.password) {
+    if (loginRole === 'customer' && !form.phone) {
+      setError(t('errors.required_field'));
+      return;
+    }
+    if (loginRole === 'admin' && !form.username) {
+      setError(t('errors.required_field'));
+      return;
+    }
+    if (!form.password) {
       setError(t('errors.required_field'));
       return;
     }
     setLoading(true);
     setError('');
 
-    const { error: loginError } = await login({
-      email: form.email,
-      password: form.password,
-    });
+    const loginData = { password: form.password };
+    if (loginRole === 'customer') {
+      loginData.phone = form.phone;
+    } else {
+      loginData.username = form.username;
+    }
+
+    const { error: loginError } = await login(loginData);
 
     if (loginError) {
-      setError(t('errors.login_failed'));
+      console.error("Login Error:", loginError);
+      setError(loginError.message || t('errors.login_failed'));
     } else {
       if (loginRole === 'admin') {
         navigate('/admin', { replace: true });
@@ -100,22 +113,41 @@ export default function LoginPage() {
           </div>
 
           <div className="auth-form__fields">
-            <div className="input-group">
-              <label className="input-group__label">{t('auth.email')}</label>
-              <div className="input-wrapper">
-                <Mail size={16} className="input-icon" />
-                <input
-                  type="email"
-                  name="email"
-                  className="input input--with-icon"
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={handleChange}
-                  autoComplete="email"
-                  required
-                />
+            {loginRole === 'customer' ? (
+              <div className="input-group">
+                <label className="input-group__label">{t('auth.phone')}</label>
+                <div className="input-wrapper">
+                  <Phone size={16} className="input-icon" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    className="input input--with-icon"
+                    placeholder="9876543210"
+                    value={form.phone}
+                    onChange={handleChange}
+                    autoComplete="tel"
+                    required={loginRole === 'customer'}
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="input-group">
+                <label className="input-group__label">Username</label>
+                <div className="input-wrapper">
+                  <span className="input-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', color: 'var(--text-muted)' }}>@</span>
+                  <input
+                    type="text"
+                    name="username"
+                    className="input input--with-icon"
+                    placeholder="admin"
+                    value={form.username}
+                    onChange={handleChange}
+                    autoComplete="username"
+                    required={loginRole === 'admin'}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="input-group">
               <label className="input-group__label">{t('auth.password')}</label>

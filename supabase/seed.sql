@@ -3,26 +3,26 @@
 -- Run AFTER schema.sql and rls-policies.sql
 -- ============================================================
 -- ============================================================
--- Default Main Admin (ararunramesh7@gmail.com)
+-- Default Main Admin (+918946003470)
 -- ============================================================
 DO $$
 DECLARE
   v_admin_id UUID := '00000000-0000-0000-0000-000000000001';
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'ararunramesh7@gmail.com') THEN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE phone = '+918946003470') THEN
     INSERT INTO auth.users (
-      id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role
+      id, instance_id, phone, encrypted_password, phone_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role
     ) VALUES (
-      v_admin_id, '00000000-0000-0000-0000-000000000000', 'ararunramesh7@gmail.com', crypt('arunboxer', gen_salt('bf')), now(),
-      '{"provider":"email","providers":["email"]}',
+      v_admin_id, '00000000-0000-0000-0000-000000000000', '+918946003470', crypt('arunboxer', gen_salt('bf')), now(),
+      '{"provider":"phone","providers":["phone"]}',
       '{"full_name":"Arun Ramesh","role":"admin"}',
       'authenticated', 'authenticated'
     );
     
     INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-    VALUES (gen_random_uuid(), v_admin_id, v_admin_id::TEXT, format('{"sub":"%s","email":"ararunramesh7@gmail.com"}', v_admin_id::TEXT)::JSONB, 'email', now(), now(), now());
+    VALUES (gen_random_uuid(), v_admin_id, '+918946003470', format('{"sub":"%s","phone":"+918946003470"}', v_admin_id::TEXT)::JSONB, 'phone', now(), now(), now());
 
-    UPDATE profiles SET role = 'admin' WHERE id = v_admin_id;
+    UPDATE profiles SET role = 'admin', phone = '+918946003470' WHERE id = v_admin_id;
   END IF;
 END $$;
 
